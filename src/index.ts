@@ -11,6 +11,7 @@ class Stonk extends Command {
     help: flags.help({ char: 'h' }),
     purchase: flags.string({ char: 'p', description: 'What was your purchase price' }),
     shares: flags.string({ char: 'n', description: 'How many shares do you own?' }),
+    int: flags.integer({ char: 'i', description: 'How often to check in seconds (defaults to 20)', default: 20 }),
   }
 
   static args = [
@@ -31,7 +32,7 @@ class Stonk extends Command {
     const purchase = Number.parseFloat(flags.purchase!);
 
     this.fetchAndPrintData(symbol, shares, purchase);
-    setInterval(() => this.fetchAndPrintData(symbol, shares, purchase), 20000);
+    setInterval(() => this.fetchAndPrintData(symbol, shares, purchase), flags.int * 1000);
   }
 
   async fetchAndPrintData(symbol: string, shares: number, purchase: number): Promise<void> {
