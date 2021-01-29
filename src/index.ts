@@ -9,17 +9,19 @@ class Stonk extends Command {
     // add --version flag to show CLI version
     version: flags.version({ char: 'v' }),
     help: flags.help({ char: 'h' }),
-    symbol: flags.string({ char: 's', description: 'symbol' }),
     purchase: flags.string({ char: 'p', description: 'What was your purchase price' }),
     shares: flags.string({ char: 'n', description: 'How many shares do you own?' }),
   }
 
-  static args = [];
+  static args = [
+    { name: 'symbol' },
+  ];
 
   currentProfit = 0;
 
   async run() {
-    const { flags } = this.parse(Stonk);
+    const { args, flags } = this.parse(Stonk);
+    const { symbol } = args;
 
     if (!flags.purchase || !flags.shares) {
       return;
@@ -28,12 +30,12 @@ class Stonk extends Command {
     const shares = Number.parseFloat(flags.shares!);
     const purchase = Number.parseFloat(flags.purchase!);
 
-    this.fetchAndPrintData(flags, shares, purchase);
-    setInterval(() => this.fetchAndPrintData(flags, shares, purchase), 20000);
+    this.fetchAndPrintData(symbol, shares, purchase);
+    setInterval(() => this.fetchAndPrintData(symbol, shares, purchase), 20000);
   }
 
-  async fetchAndPrintData(flags: any, shares: number, purchase: number): Promise<void> {
-    const url = `https://query1.finance.yahoo.com/v7/finance/quote?lang=en-US&region=US&corsDomain=finance.yahoo.com&fields=symbol,regularMarketPrice&symbols=${flags.symbol}`;
+  async fetchAndPrintData(symbol: string, shares: number, purchase: number): Promise<void> {
+    const url = `https://query1.finance.yahoo.com/v7/finance/quote?lang=en-US&region=US&corsDomain=finance.yahoo.com&fields=symbol,regularMarketPrice&symbols=${symbol}`;
     const resp = await fetch(url);
     const data = await resp.json();
     const curr = data.quoteResponse.result[0].regularMarketPrice;
